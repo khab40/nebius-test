@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/khab40/nebius-test/compare/v1.1.0...v1.1.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* relase-please token missed ([df435d1](https://github.com/khab40/nebius-test/commit/df435d120893d6d0b40f840f7bfe551e92f31efd))
+
 ## [1.1.0](https://github.com/khab40/nebius-test/compare/v1.0.1...v1.1.0) (2026-02-24)
 
 
