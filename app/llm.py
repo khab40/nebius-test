@@ -2,6 +2,8 @@ import os
 from typing import Any, Dict, List, Tuple
 
 import httpx
+from langchain_openai import ChatOpenAI
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
 
 class LLMError(Exception):
     pass
@@ -25,9 +27,8 @@ def _nebius_cfg() -> Tuple[str, str, str]:
     model = os.getenv("NEBIUS_MODEL", "meta-llama/Meta-Llama-3.1-8B-Instruct-fast")
     return api_key, base_url.rstrip("/") + "/", model
 
-async def chat_completion(messages: List[Dict[str, str]], temperature: float = 0.2) -> str:
+def _get_langchain_llm(json_mode: bool = False) -> ChatOpenAI:
     provider = _provider()
-
     if provider == "openai":
         api_key, base_url, model = _openai_cfg()
     elif provider == "nebius":
@@ -35,31 +36,35 @@ async def chat_completion(messages: List[Dict[str, str]], temperature: float = 0
     else:
         raise LLMError('LLM_PROVIDER must be "openai" or "nebius".')
 
-    url = base_url + "chat/completions"
+    model_kwargs = {}
+    if json_mode and provider == "openai":
+        model_kwargs["response_format"] = {"type": "json_object"}
 
-    payload: Dict[str, Any] = {
-        "model": model,
-        "messages": messages,
-        "temperature": temperature,
-    }
+    return ChatOpenAI(
+        model=model,
+        openai_api_key=api_key,
+        openai_api_base=base_url,
+        temperature=0.2,
+        max_retries=3,
+        model_kwargs=model_kwargs,
+    )
 
-    # OpenAI supports JSON mode via response_format on Chat Completions
-    if provider == "openai":
-        payload["response_format"] = {"type": "json_object"}
+async def chat_completion(messages: List[Dict[str, str]], temperature: float = 0.2, json_mode: bool = False) -> str:
+    llm = _get_langchain_llm(json_mode=json_mode)
+    llm.temperature = temperature
 
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
+    # Convert messages to LangChain format
+    langchain_messages = []
+    for msg in messages:
+        role = msg.get("role", "")
+        content = msg.get("content", "")
+        if role == "system":
+            langchain_messages.append(SystemMessage(content=content))
+        elif role == "user":
+            langchain_messages.append(HumanMessage(content=content))
+        elif role == "assistant":
+            langchain_messages.append(AIMessage(content=content))
 
-    async with httpx.AsyncClient() as client:
-        r = await client.post(url, headers=headers, json=payload, timeout=90.0)
-
-    if r.status_code >= 400:
-        raise LLMError(f"{provider} API error ({r.status_code}): {r.text[:500]}")
-
-    data = r.json()
-    try:
-        return data["choices"][0]["message"]["content"]
-    except Exception as e:
-        raise LLMError("Unexpected LLM response format.") from e
+    # Use invoke for synchronous call, but since we're in async context, we can use it
+    response = await llm.ainvoke(langchain_messages)
+    return response.content

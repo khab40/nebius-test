@@ -118,6 +118,51 @@ Env vars:
 - `NEBIUS_BASE_URL` (optional, default: `https://api.tokenfactory.nebius.com/v1/`)
 - `LLM_PROVIDER=nebius`
 
+## LangSmith Monitoring & Tracing
+
+This application is integrated with **LangSmith** for comprehensive LLM monitoring, debugging, and performance analysis.
+
+### Features
+- **Real-time Tracing**: Complete execution flow tracking for all LLM calls
+- **Performance Metrics**: Latency, token usage, and cost monitoring
+- **Error Tracking**: Detailed error analysis and debugging information
+- **Dataset Management**: Create evaluation datasets from production traces
+- **Model Comparison**: Compare performance across different models and providers
+
+### Setup
+The integration is automatically enabled when the following environment variables are set:
+
+```bash
+# LangSmith Configuration
+LANGCHAIN_API_KEY="lsv2_pt_..."  # Your LangSmith API key
+LANGCHAIN_TRACING_V2=true       # Enable tracing
+LANGCHAIN_PROJECT="nebius-test"  # Project name for organization
+```
+
+### Accessing LangSmith Dashboard
+
+1. Visit [LangSmith Dashboard](https://smith.langchain.com)
+2. Select the "nebius-test" project from the dropdown
+3. View traces, performance metrics, and monitoring data
+
+### What You'll See
+
+- **Traces**: Complete request/response flows with input prompts and LLM outputs
+- **Token Usage**: Input/output token counts and cost estimates
+- **Latency Metrics**: Response times for each LLM call
+- **Error Analysis**: Failed requests with detailed error information
+- **Model Performance**: Success rates and quality metrics
+
+### Benefits
+
+- **Debug Issues**: Trace through complex LLM interactions
+- **Optimize Performance**: Identify slow or costly operations
+- **Monitor Quality**: Track response quality and consistency
+- **Cost Management**: Monitor and control LLM usage costs
+- **Continuous Improvement**: Use traces to create evaluation datasets
+
+The LangSmith integration provides enterprise-grade observability for your LLM-powered application, helping you maintain high performance and reliability.
+
 ## Install (local dev, no Docker)
 ```bash
 python -m venv .venv

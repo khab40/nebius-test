@@ -168,6 +168,7 @@ Repository content (directory tree + RAG-selected snippets; filtered & truncated
                 {"role": "user", "content": user},
             ],
             temperature=0.2,
+            json_mode=True,
         )
     except LLMError as e:
         raise SummarizationError(str(e)) from e
