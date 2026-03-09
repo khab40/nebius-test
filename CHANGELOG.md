@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/khab40/nebius-test/compare/v1.1.1...v1.2.0) (2026-03-09)
+
+
+### Features
+
+* LangSmith tracing added ([803bc0e](https://github.com/khab40/nebius-test/commit/803bc0ec4bf9ecd4bbfb2cba29a88bbc888657da))
+
 ## [1.1.1](https://github.com/khab40/nebius-test/compare/v1.1.0...v1.1.1) (2026-02-25)
 
 
